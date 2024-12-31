@@ -19,7 +19,8 @@ type farm struct {
 func main() {
 	var myFarm farm
 	myFarm.Read("test.txt")
-	BFS(myFarm)
+	fmt.Printf("\nall sorted paths from start to end: %v\n", BFS(myFarm))
+	fmt.Println(Ants(myFarm, BFS(myFarm)))
 	// fmt.Println("number of ants is : ", myFarm.ants_number)
 	// fmt.Println("rooms are : ", myFarm.rooms)
 	// fmt.Println("start is : ", myFarm.start)
@@ -110,7 +111,7 @@ func Graph(farm farm) map[string][]string {
 	return adjacent
 }
 
-func BFS(myFarm farm) {
+func BFS(myFarm farm) [][]string {
 	adjacent := Graph(myFarm)
 	var Queue []string
 	var endd string
@@ -148,7 +149,7 @@ func BFS(myFarm farm) {
 
 			if !Visited[endd] {
 				fmt.Printf("\n No path found to end room \n")
-				return
+				return [][]string{}
 			}
 
 			path := []string{endd}
@@ -163,7 +164,8 @@ func BFS(myFarm farm) {
 		}
 	}
 	Sorted = SortPath(Sorted)
-	fmt.Printf("\nall sorted paths from start to end: %v\n", Sorted)
+	// fmt.Printf("\nall sorted paths from start to end: %v\n", Sorted)
+	return Sorted
 }
 
 func SortPath(Paths [][]string) [][]string {
@@ -182,18 +184,28 @@ func SortPath(Paths [][]string) [][]string {
 	return append(append(SortPath(less), pivot), SortPath(greater)...)
 }
 
-func Ants() [][]string {
-	Content, err := os.ReadFile("test.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	SplitContent := strings.Split(string(Content), "\n")
+func Ants(myFarm farm, paths [][]string) [][]string {
+	ants := myFarm.ants_number
 
-	AntsNbr, err := strconv.ParseInt(SplitContent[0], 10, 32)
-	if err != nil {
-		log.Fatal(err)
+	fmt.Println("num of ants is :", ants)
+
+	k := 0
+	for i := 0; i < ants; i++ {
+		for j := 0; j < len(paths); j++ {
+			if k < len(paths) {
+				if len(paths[k]) <= len(paths[j]) {
+					paths[k] = append(paths[k], "L"+strconv.Itoa(i))
+					break
+				}
+			} else {
+				k = 0
+				if len(paths[k]) <= len(paths[j]) {
+					paths[k] = append(paths[k], "L"+strconv.Itoa(i))
+					break
+				}
+			}
+		}
+		k++
 	}
-	for i := 0; i < int(AntsNbr); i++ {
-		
-	}
+	return paths
 }
