@@ -20,7 +20,8 @@ func main() {
 	var myFarm farm
 	myFarm.Read("test.txt")
 	fmt.Printf("\nall sorted paths from start to end: %v\n", BFS(myFarm))
-	fmt.Println(Ants(myFarm, BFS(myFarm)))
+	fmt.Println("Place all Ants on there path: ", Ants(myFarm, BFS(myFarm)))
+	// fmt.Println(Ants(myFarm, BFS(myFarm)))
 	// fmt.Println("number of ants is : ", myFarm.ants_number)
 	// fmt.Println("rooms are : ", myFarm.rooms)
 	// fmt.Println("start is : ", myFarm.start)
@@ -190,16 +191,16 @@ func Ants(myFarm farm, paths [][]string) [][]string {
 	fmt.Println("num of ants is :", ants)
 
 	k := 0
-	for i := 0; i < ants; i++ {
+	for i := ants; i > 0; i-- {
 		for j := 0; j < len(paths); j++ {
 			if k < len(paths) {
-				if len(paths[k]) <= len(paths[j]) {
+				if len(paths[k]) >= len(paths[j]) {
 					paths[k] = append(paths[k], "L"+strconv.Itoa(i))
 					break
 				}
 			} else {
 				k = 0
-				if len(paths[k]) <= len(paths[j]) {
+				if len(paths[k]) >= len(paths[j]) {
 					paths[k] = append(paths[k], "L"+strconv.Itoa(i))
 					break
 				}
@@ -207,5 +208,18 @@ func Ants(myFarm farm, paths [][]string) [][]string {
 		}
 		k++
 	}
+
 	return paths
+}
+
+func MoveAnts(paths [][]string)string {
+	for _, v := range paths {
+		for i := 1; i < len(v); i++ {
+			if v[i] == "end"{
+
+			}
+			fmt.Print(v[len(v)-i] + v[i])
+			
+		}
+	}
 }
