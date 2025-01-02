@@ -21,6 +21,8 @@ func main() {
 	myFarm.Read("test.txt")
 	fmt.Printf("\nall sorted paths from start to end: %v\n", BFS(myFarm))
 	fmt.Println("Place all Ants on there path: ", Ants(myFarm, BFS(myFarm)))
+	MoveAnts(Ants(myFarm, BFS(myFarm)))
+
 	// fmt.Println(Ants(myFarm, BFS(myFarm)))
 	// fmt.Println("number of ants is : ", myFarm.ants_number)
 	// fmt.Println("rooms are : ", myFarm.rooms)
@@ -212,14 +214,18 @@ func Ants(myFarm farm, paths [][]string) [][]string {
 	return paths
 }
 
-func MoveAnts(paths [][]string)string {
-	for _, v := range paths {
-		for i := 1; i < len(v); i++ {
-			if v[i] == "end"{
+func MoveAnts(paths [][]string) {
+	
+	for i := 0; i < len(paths); i++ {
+		k := len(paths[i]) - 1
+		for j := 1; j < len(paths[i]); j++ {
 
-			}
-			fmt.Print(v[len(v)-i] + v[i])
-			
+			fmt.Print(paths[i][k] + "-" + paths[i][j] + " ")
+			k--
+			break
+		}
+		if i == len(paths)-1 {
+			fmt.Println()
 		}
 	}
 }
