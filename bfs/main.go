@@ -218,6 +218,22 @@ func Ants(myFarm farm, paths [][]string) [][]string {
 }
 
 func MoveAnts(myFarm farm, paths [][]string) {
+
+	// for i := 0; i < len(paths); i++ {
+	// 	k := len(paths[i]) - 1
+	// 	for j := 1; j < len(paths[i]); j++ {
+
+	// 		fmt.Print(paths[i][k] + "-" + paths[i][j] + " ")
+	// 		k--
+	// 		break
+	// 	}
+	// 	if i == len(paths)-1 {
+	// 		fmt.Println()
+	// 	}
+	// }
+
+
+
 	var a, b []string
 
 	all := [][][]string{}
