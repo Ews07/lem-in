@@ -24,7 +24,7 @@ func main() {
 
 	fmt.Printf("\nall sorted paths from start to end: %s\n", bfs)
 	fmt.Println("Place all Ants on there path: ", ants)
-	MoveAnts(myFarm, bfs)
+	MoveAnts(myFarm, ants)
 
 	// fmt.Println(Ants(myFarm, BFS(myFarm)))
 	// fmt.Println("number of ants is : ", myFarm.ants_number)
@@ -218,21 +218,24 @@ func Ants(myFarm farm, paths [][]string) [][]string {
 }
 
 func MoveAnts(myFarm farm, paths [][]string) {
-
 	// for i := 0; i < len(paths); i++ {
 	// 	k := len(paths[i]) - 1
 	// 	for j := 1; j < len(paths[i]); j++ {
 
+	// 		if paths[i][j] == "end" {
+	// 			fmt.Print(paths[i][k] + "-" + paths[i][j] + " ")
+	// 			break
+	// 		}
+
 	// 		fmt.Print(paths[i][k] + "-" + paths[i][j] + " ")
-	// 		k--
-	// 		break
+	// 		if i == len(paths)-1 {
+	// 			k--
+	// 		}
+
 	// 	}
-	// 	if i == len(paths)-1 {
-	// 		fmt.Println()
-	// 	}
+	// 	fmt.Println()
+
 	// }
-
-
 
 	var a, b []string
 
@@ -242,7 +245,7 @@ func MoveAnts(myFarm farm, paths [][]string) {
 		for j := 0; j < len(g[i]); j++ {
 			if strings.HasPrefix(g[i][j], "L") {
 				b = append(b, g[i][j])
-			} else {
+			} else if j != 0 {
 				a = append(a, g[i][j])
 			}
 		}
@@ -253,13 +256,31 @@ func MoveAnts(myFarm farm, paths [][]string) {
 	}
 	fmt.Print("all paths separed: ", all)
 
-	
+	var RoomsArray [][][]string
+	var ArrayElem [][]string
+	var Elem []string
+
 	for i := 0; i < len(all); i++ {
-		k := 0
-		for j := len(all[i])-1; j >=0; j--{
-			fmt.Print(all[i][j][len(all[i][j])-1-k]+"-"+)
+		for j := len(all[i][1]) - 1; j >= 0; j-- {
+			for k := 0; k < len(all[i][0]); k++ {
+				Elem = append(Elem, all[i][1][j]+"-"+all[i][0][k])
+			}
+			ArrayElem = append(ArrayElem, Elem)
+			Elem = []string{}
 
 		}
-		
+		RoomsArray = append(RoomsArray, ArrayElem)
+		ArrayElem = [][]string{}
 	}
+
+	fmt.Print("\nants in Rooms: ", RoomsArray)
+
+	// for i := 0; i < len(all); i++ {
+	// 	k := 0
+	// 	for j := len(all[i])-1; j >=0; j--{
+	// 		fmt.Print(all[i][j][len(all[i][j])-1-k]+"-"+)
+
+	// 	}
+
+	// }
 }
