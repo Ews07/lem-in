@@ -19,9 +19,12 @@ type farm struct {
 func main() {
 	var myFarm farm
 	myFarm.Read("test.txt")
-	fmt.Printf("\nall sorted paths from start to end: %v\n", BFS(myFarm))
-	fmt.Println("Place all Ants on there path: ", Ants(myFarm, BFS(myFarm)))
-	MoveAnts(Ants(myFarm, BFS(myFarm)))
+	bfs := BFS(myFarm)
+	ants := Ants(myFarm, BFS(myFarm))
+
+	fmt.Printf("\nall sorted paths from start to end: %s\n", bfs)
+	fmt.Println("Place all Ants on there path: ", ants)
+	MoveAnts(myFarm, bfs)
 
 	// fmt.Println(Ants(myFarm, BFS(myFarm)))
 	// fmt.Println("number of ants is : ", myFarm.ants_number)
@@ -151,7 +154,7 @@ func BFS(myFarm farm) [][]string {
 			}
 
 			if !Visited[endd] {
-				fmt.Printf("\n No path found to end room \n")
+				fmt.Print("\n No path found to end room \n")
 				return [][]string{}
 			}
 
@@ -214,18 +217,33 @@ func Ants(myFarm farm, paths [][]string) [][]string {
 	return paths
 }
 
-func MoveAnts(paths [][]string) {
-	
-	for i := 0; i < len(paths); i++ {
-		k := len(paths[i]) - 1
-		for j := 1; j < len(paths[i]); j++ {
+func MoveAnts(myFarm farm, paths [][]string) {
+	var a, b []string
 
-			fmt.Print(paths[i][k] + "-" + paths[i][j] + " ")
-			k--
-			break
+	all := [][][]string{}
+	g := Ants(myFarm, BFS(myFarm))
+	for i := 0; i < len(g); i++ {
+		for j := 0; j < len(g[i]); j++ {
+			if strings.HasPrefix(g[i][j], "L") {
+				b = append(b, g[i][j])
+			} else {
+				a = append(a, g[i][j])
+			}
 		}
-		if i == len(paths)-1 {
-			fmt.Println()
+		all = append(all, [][]string{a, b})
+
+		a = []string{}
+		b = []string{}
+	}
+	fmt.Print("all paths separed: ", all)
+
+	
+	for i := 0; i < len(all); i++ {
+		k := 0
+		for j := len(all[i])-1; j >=0; j--{
+			fmt.Print(all[i][j][len(all[i][j])-1-k]+"-"+)
+
 		}
+		
 	}
 }
