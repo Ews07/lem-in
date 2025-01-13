@@ -132,6 +132,7 @@ func BFS(myFarm farm) [][]string {
 
 			Queue = append(Queue, adj)
 			Visited[adj] = true
+			Visited[key] = true
 			for key := range end {
 				endd = key
 			}
@@ -139,16 +140,19 @@ func BFS(myFarm farm) [][]string {
 			for len(Queue) > 0 {
 				current := Queue[0]
 				Queue = Queue[1:]
+				// Visited[current] = true
 				if current == endd {
 					Queue = []string{}
 					break
 				}
 
 				for _, link := range adjacent[current] {
+					//Visited[current] = true
 					if !Visited[link] {
 						Queue = append(Queue, link)
 						Visited[link] = true
 						Parents[link] = current
+						break
 					}
 				}
 			}
