@@ -20,11 +20,11 @@ func main() {
 	var myFarm farm
 	myFarm.Read("test.txt")
 	bfs := BFS(myFarm)
-	ants := Ants(myFarm, BFS(myFarm))
+	// ants := Ants(myFarm, BFS(myFarm))
 
 	fmt.Printf("\nall sorted paths from start to end: %s\n", bfs)
-	fmt.Println("Place all Ants on there path: ", ants)
-	MoveAnts(myFarm, ants)
+	// fmt.Println("Place all Ants on there path: ", ants)
+	// MoveAnts(myFarm, ants)
 
 	// fmt.Println(Ants(myFarm, BFS(myFarm)))
 	// fmt.Println("number of ants is : ", myFarm.ants_number)
@@ -124,56 +124,105 @@ func BFS(myFarm farm) [][]string {
 	start := myFarm.start
 	end := myFarm.end
 	var Sorted [][]string
+	// var AllPaths [][]string
+	Visited := make(map[string]bool)
 
 	for key := range start {
+		Visited[key] = true
+		for key := range end {
+			endd = key
+		}
+
+		isUsed := make(map[string]bool)
+		i := 0
 		for _, adj := range adjacent[key] {
-			Visited := make(map[string]bool)
-			Parents := make(map[string]string)
-
-			Queue = append(Queue, adj)
 			Visited[adj] = true
-			Visited[key] = true
-			for key := range end {
-				endd = key
-			}
 
+			var current string
+			// Visited[endd] = false
+			Parents := make(map[string]string)
+			Queue = append(Queue, adj)
+
+			finEnd := false
 			for len(Queue) > 0 {
-				current := Queue[0]
-				Queue = Queue[1:]
+				current = Queue[0]
+				for _, v := range Queue {
+					if v == endd {
+						current = v
+						finEnd = true
+						Queue = []string{}
+						break
+					}
+				}
+
+				fmt.Println("\nCurrent = ", current)
+				Visited[current] = true
+				if !finEnd {
+					if len(Queue) == 1 {
+						Queue = []string{}
+					} else {
+						Queue = Queue[1:]
+					}
+				}
+
+				fmt.Println("Queue after removing current = ", Queue)
 				// Visited[current] = true
 				if current == endd {
+					Visited[current] = true
+					// for _, v := range Queue {
+					// 	if !isUsed[v] {
+					// 		Visited[v] = false
+					// 	}
+					// }
+					fmt.Println("Queue at current=endd is: ", Queue)
 					Queue = []string{}
+					// AllPaths = append(AllPaths, Queue)
+
 					break
 				}
 
 				for _, link := range adjacent[current] {
-					//Visited[current] = true
+					// Visited[current] = true
+					// if link == endd {
+					// 	Queue = append(Queue, link)
+					// 	// Visited[link] = true
+					// 	Parents[link] = current
+					// 	break
+					// }
+
 					if !Visited[link] {
+
 						Queue = append(Queue, link)
-						Visited[link] = true
+						fmt.Println("Queue after adding link = ", Queue)
+						// Visited[link] = true
 						Parents[link] = current
-						break
 					}
 				}
 			}
 
 			if !Visited[endd] {
 				fmt.Print("\n No path found to end room \n")
-				return [][]string{}
+				continue
 			}
-
+			Visited[endd] = false
 			path := []string{endd}
-			current := endd
+			current = endd
 
 			for Parents[current] != "" {
 				current = Parents[current]
+				isUsed[current] = true
 				path = append([]string{current}, path...)
 			}
 			path = append([]string{key}, path...)
+			fmt.Printf("\nPath N° %v is : %v\n", i, path)
+			i++
 			Sorted = append(Sorted, path)
 		}
+		break
 	}
-	Sorted = SortPath(Sorted)
+
+	// fmt.Println("\nAllPaths: ", AllPaths)
+	// Sorted = SortPath(Sorted)
 	// fmt.Printf("\nall sorted paths from start to end: %v\n", Sorted)
 	return Sorted
 }
@@ -203,43 +252,40 @@ func Ants(myFarm farm, paths [][]string) [][]string {
 	for i := ants; i > 0; i-- {
 		for j := 0; j < len(paths); j++ {
 			if k < len(paths) {
-				if len(paths[k]) >= len(paths[j]) {
+				if len(paths[k]) <= len(paths[j]) {
 					paths[k] = append(paths[k], "L"+strconv.Itoa(i))
+					k++
 					break
+				} else {
+					k = 0
 				}
 			} else {
 				k = 0
-				if len(paths[k]) >= len(paths[j]) {
-					paths[k] = append(paths[k], "L"+strconv.Itoa(i))
-					break
-				}
 			}
 		}
-		k++
 	}
 
 	return paths
 }
 
 func MoveAnts(myFarm farm, paths [][]string) {
-	// for i := 0; i < len(paths); i++ {
-	// 	k := len(paths[i]) - 1
-	// 	for j := 1; j < len(paths[i]); j++ {
+	for i := 0; i < len(paths); i++ {
+		k := len(paths[i]) - 1
+		for j := 1; j < len(paths[i]); j++ {
 
-	// 		if paths[i][j] == "end" {
-	// 			fmt.Print(paths[i][k] + "-" + paths[i][j] + " ")
-	// 			break
-	// 		}
+			// if paths[i][j] == "end" {
+			// 	fmt.Print(paths[i][k] + "-" + paths[i][j] + " ")
+			// 	break
+			// }
 
-	// 		fmt.Print(paths[i][k] + "-" + paths[i][j] + " ")
-	// 		if i == len(paths)-1 {
-	// 			k--
-	// 		}
+			fmt.Print(paths[i][k] + "-" + paths[i][j] + " ")
+			// if i == len(paths)-1 {
+			// 	k--
+			// }
+			break
+		}
 
-	// 	}
-	// 	fmt.Println()
-
-	// }
+	}
 
 	var a, b []string
 
@@ -268,6 +314,9 @@ func MoveAnts(myFarm farm, paths [][]string) {
 		for j := len(all[i][1]) - 1; j >= 0; j-- {
 			for k := 0; k < len(all[i][0]); k++ {
 				Elem = append(Elem, all[i][1][j]+"-"+all[i][0][k])
+				for l := j; l < j; l++ {
+					Elem = append([]string{"zz"}, Elem...)
+				}
 			}
 			ArrayElem = append(ArrayElem, Elem)
 			Elem = []string{}
@@ -287,4 +336,18 @@ func MoveAnts(myFarm farm, paths [][]string) {
 	// 	}
 
 	// }
+	AfterPrint := [][]string{}
+
+	for i := 0; i < len(RoomsArray); i++ {
+		for j := 0; j < len(RoomsArray[i]); j++ {
+			AfterPrint = append(AfterPrint, RoomsArray[i][j])
+		}
+	}
+	fmt.Println("\n After Print: ", AfterPrint)
+
+	for _, v := range AfterPrint {
+		for i := 0; i < len(v); i++ {
+			fmt.Print(v[i])
+		}
+	}
 }
