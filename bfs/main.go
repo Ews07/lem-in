@@ -18,9 +18,11 @@ type farm struct {
 
 func main() {
 	var myFarm farm
+	scenario := false
 	myFarm.Read("test.txt")
-	bfs := BFS(myFarm)
-	ants := Ants(myFarm, BFS(myFarm))
+	bfs := BFS(myFarm, scenario)
+	ants := Ants(myFarm, BFS(myFarm, scenario), BFS(myFarm, !scenario))
+	fmt.Println(scenario, !scenario)
 
 	fmt.Printf("\nall sorted paths from start to end: %s\n", bfs)
 	fmt.Println("Place all Ants on there path: ", ants)
@@ -102,30 +104,45 @@ func (myFarm *farm) Read(filename string) {
 	}
 }
 
-func Graph(farm farm) map[string][]string {
+func Graph(farm farm, scenario bool) map[string][]string {
 	adjacent := make(map[string][]string)
+	var Start string
+	for key := range farm.start {
+		Start = key
+	}
+
 	for room := range farm.rooms {
 		adjacent[room] = []string{}
 	}
 	for room, links := range farm.links {
 		for _, link := range links {
-			adjacent[room] = append(adjacent[room], link)
-			adjacent[link] = append(adjacent[link], room)
+			if scenario {
+				if room == Start {
+					adjacent[room] = append([]string{link}, adjacent[room]...)
+					adjacent[link] = append([]string{room}, adjacent[link]...)
+				} else {
 
+					adjacent[room] = append(adjacent[room], link)
+					adjacent[link] = append(adjacent[link], room)
+				}
+			} else {
+
+				adjacent[room] = append(adjacent[room], link)
+				adjacent[link] = append(adjacent[link], room)
+			}
 		}
 	}
 
 	return adjacent
 }
 
-func BFS(myFarm farm) [][]string {
-	adjacent := Graph(myFarm)
+func BFS(myFarm farm, scenario bool) [][]string {
+	adjacent := Graph(myFarm, scenario)
 	var Queue []string
 	var endd string
 	start := myFarm.start
 	end := myFarm.end
 	var Sorted [][]string
-	// var AllPaths [][]string
 	Visited := make(map[string]bool)
 
 	for key := range start {
@@ -133,14 +150,11 @@ func BFS(myFarm farm) [][]string {
 		for key := range end {
 			endd = key
 		}
-
-		// isUsed := make(map[string]bool)
 		i := 0
 		for _, adj := range adjacent[key] {
 			Visited[adj] = true
 
 			var current string
-			// Visited[endd] = false
 			Parents := make(map[string]string)
 			Queue = append(Queue, adj)
 
@@ -244,31 +258,59 @@ func SortPath(Paths [][]string) [][]string {
 	return append(append(SortPath(less), pivot), SortPath(greater)...)
 }
 
-func Ants(myFarm farm, paths [][]string) [][]string {
+func Ants(myFarm farm, path1, path2 [][]string) [][]string {
 	ants := myFarm.ants_number
-
+	paths := [][]string{}
 	fmt.Println("num of ants is :", ants)
 
 	// for i := 0; i < len(paths); i++ {
 	i := 0
 	j := 1
 	for j <= ants {
-		for k := 0; k < len(paths); k++ {
-			if i < len(paths) {
-				if len(paths[i]) > len(paths[k]) {
+		for k := 0; k < len(path1); k++ {
+			if i < len(path1) {
+				if len(path1[i]) > len(path1[k]) {
 					i = k
 				}
 			} else {
 				i = 0
 			}
-			if k == len(paths)-1 {
-				paths[i] = append(paths[i], "L"+strconv.Itoa(j))
+			if k == len(path1)-1 {
+				path1[i] = append(path1[i], "L"+strconv.Itoa(j))
 				i = 0
 			}
 		}
 		j++
 	}
-	fmt.Println("\n", j)
+
+	m := 0
+	n := 1
+	for n <= ants {
+		for k := 0; k < len(path2); k++ {
+			if m < len(path2) {
+				if len(path2[m]) > len(path2[k]) {
+					m = k
+				}
+			} else {
+				m = 0
+			}
+			if k == len(path2)-1 {
+				path2[m] = append(path2[m], "L"+strconv.Itoa(n))
+				m = 0
+			}
+		}
+		n++
+	}
+	if len(path1[len(SortPath(path1))-1]) <= len(path2[len(SortPath(path2))-1]) {
+		for _, v := range path1 {
+			paths = append(paths, v)
+		}
+	} else {
+		for _, v := range path2 {
+			paths = append(paths, v)
+		}
+	}
+
 	// }
 
 	// k := 0
@@ -291,7 +333,7 @@ func Ants(myFarm farm, paths [][]string) [][]string {
 	return paths
 }
 
-func MoveAnts(myFarm farm, paths [][]string) {
+func MoveAnts(myFarm farm, paths [][]string, scenario bool) {
 	for i := 0; i < len(paths); i++ {
 		k := len(paths[i]) - 1
 		for j := 1; j < len(paths[i]); j++ {
@@ -313,7 +355,7 @@ func MoveAnts(myFarm farm, paths [][]string) {
 	var a, b []string
 
 	all := [][][]string{}
-	g := Ants(myFarm, BFS(myFarm))
+	g := Ants(myFarm, BFS(myFarm, false), BFS(myFarm, true))
 	for i := 0; i < len(g); i++ {
 		for j := 0; j < len(g[i]); j++ {
 			if strings.HasPrefix(g[i][j], "L") {
