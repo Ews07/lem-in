@@ -21,10 +21,12 @@ func main() {
 	scenario := false
 	myFarm.Read("test.txt")
 	bfs := BFS(myFarm, scenario)
+	bfsn := BFS(myFarm, !scenario)
+	fmt.Println("not scenario :", bfsn)
 	ants := Ants(myFarm, BFS(myFarm, scenario), BFS(myFarm, !scenario))
 	fmt.Println(scenario, !scenario)
 
-	fmt.Printf("\nall sorted paths from start to end: %s\n", bfs)
+	fmt.Printf("\nall sorted paths from start to end with scenario: %s\n", bfs)
 	fmt.Println("Place all Ants on there path: ", ants)
 	// MoveAnts(myFarm, ants)
 	PrintAnts(myFarm, ants)
@@ -143,24 +145,31 @@ func BFS(myFarm farm, scenario bool) [][]string {
 	start := myFarm.start
 	end := myFarm.end
 	var Sorted [][]string
-	Visited := make(map[string]bool)
 
 	for key := range start {
+		Visited := make(map[string]bool)
 		Visited[key] = true
 		for key := range end {
 			endd = key
 		}
 		i := 0
 		for _, adj := range adjacent[key] {
-			Visited[adj] = true
+			var ar []string
+			if !Visited[adj] {
+
+				Queue = append(Queue, adj)
+				Visited[adj] = true
+			}
 
 			var current string
 			Parents := make(map[string]string)
-			Queue = append(Queue, adj)
 
 			finEnd := false
 			for len(Queue) > 0 {
+
 				current = Queue[0]
+
+				ar = append(ar, current)
 				for _, v := range Queue {
 					if v == endd {
 						current = v
@@ -228,6 +237,23 @@ func BFS(myFarm farm, scenario bool) [][]string {
 				// isUsed[current] = true
 				path = append([]string{current}, path...)
 			}
+			fmt.Println("array of current: ", ar)
+			c := 0
+			for i, v := range ar {
+				for _, e := range path {
+					if v != e {
+						c++
+						fmt.Printf("\nc N° %d is : %d\n", i, c)
+					}
+				}
+				if c == len(path) {
+					fmt.Printf("\nif c = 0 N° %d is : %d\n", i, c)
+
+					Visited[v] = false
+				}
+				c = 0
+			}
+
 			path = append([]string{key}, path...)
 			fmt.Printf("\nPath N° %v is : %v\n", i, path)
 			i++
@@ -283,6 +309,8 @@ func Ants(myFarm farm, path1, path2 [][]string) [][]string {
 		j++
 	}
 
+	fmt.Println("Path1 = ", path1)
+
 	m := 0
 	n := 1
 	for n <= ants {
@@ -301,6 +329,9 @@ func Ants(myFarm farm, path1, path2 [][]string) [][]string {
 		}
 		n++
 	}
+
+	fmt.Println("Path2 = ", path2)
+
 	if len(path1[len(SortPath(path1))-1]) <= len(path2[len(SortPath(path2))-1]) {
 		for _, v := range path1 {
 			paths = append(paths, v)
